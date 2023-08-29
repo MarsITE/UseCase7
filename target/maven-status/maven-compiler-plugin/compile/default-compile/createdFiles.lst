@@ -1,2 +1,4 @@
 com\softserveinc\application\student\Student.class
+com\softserveinc\application\player\Player.class
+com\softserveinc\application\player\PlayerAnalyzer.class
 com\softserveinc\application\student\StudentConverter.class

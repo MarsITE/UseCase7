@@ -60,3 +60,75 @@ public class StudentConverterTest {
 Make sure to include the required imports such as `org.junit.jupiter.api`, `org.junit.jupiter.params`, and others. If your IDE doesn't recognize some classes, it might be because the required dependencies are missing or not included.
 
 Note: This solution assumes the existence of boolean getters like `isPassed()`, `isExceptional()`, etc., in the `Student` class. Adjust accordingly if your actual class has different method names.
+
+
+
+
+
+
+
+
+
+To unit test the provided code using JUnit 5 and parameterization, you can use the `@ParameterizedTest` annotation combined with `@MethodSource` for supplying test data to the tests.
+
+Here's how you can write the test cases:
+
+```java
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
+public class PlayerAnalyzerTest {
+
+    // Data provider for positive test cases
+    static Stream<Arguments> positiveTestCasesProvider() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(new Player("John", 25, 5, Arrays.asList(2, 2, 2))), 250.0),
+                Arguments.of(Arrays.asList(new Player("Steve", 15, 3, Arrays.asList(3, 3, 3))), 67.5),
+                Arguments.of(Arrays.asList(new Player("Mike", 35, 15, Arrays.asList(4, 4, 4))), 2520.0),
+                Arguments.of(Arrays.asList(new Player("John", 25, 5, Arrays.asList(2, 2, 2)),
+                                           new Player("Steve", 15, 3, Arrays.asList(3, 3, 3))), 317.5) // 250 + 67.5
+        );
+    }
+
+    // Data provider for negative test cases
+    static Stream<Arguments> negativeTestCasesProvider() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(new Player("John", 25, 5, null)), NullPointerException.class),
+                Arguments.of(Collections.emptyList(), 0.0)
+        );
+    }
+
+    // Positive test cases
+    @ParameterizedTest
+    @MethodSource("positiveTestCasesProvider")
+    public void testCalculateScorePositive(List<Player> players, double expected) {
+        PlayerAnalyzer analyzer = new PlayerAnalyzer();
+        double actual = analyzer.calculateScore(players);
+        Assertions.assertEquals(expected, actual, 0.001);
+    }
+
+    // Negative test cases
+    @ParameterizedTest
+    @MethodSource("negativeTestCasesProvider")
+    public void testCalculateScoreNegative(List<Player> players, Object expected) {
+        PlayerAnalyzer analyzer = new PlayerAnalyzer();
+
+        if (expected instanceof Double) {
+            double actual = analyzer.calculateScore(players);
+            Assertions.assertEquals(expected, actual, 0.001);
+        } else if (expected instanceof Class && Exception.class.isAssignableFrom((Class<?>) expected)) {
+            Assertions.assertThrows((Class<? extends Exception>) expected, () -> analyzer.calculateScore(players));
+        }
+    }
+}
+```
+
+This code provides test cases for the `calculateScore` method of the `PlayerAnalyzer` class based on the given scenarios. The `@ParameterizedTest` annotation indicates that the method should be run multiple times, each time with different arguments provided by the associated `@MethodSource`. 
+
+Ensure you also import the required libraries and dependencies for JUnit 5 and that the `Player` class has the appropriate getter methods. Adjustments might be needed based on your actual project setup.
