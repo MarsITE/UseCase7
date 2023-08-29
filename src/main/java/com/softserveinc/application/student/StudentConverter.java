@@ -21,11 +21,7 @@ public class StudentConverter {
                 } else {
                     result.setHonorRoll(true);
                 }
-            } else if (student.getGrade() > 70) {
-                result.setPassed(true);
-            } else {
-                result.setPassed(false);
-            }
+            } else result.setPassed(student.getGrade() > 70);
 
             return result;
         }).collect(Collectors.toList());
